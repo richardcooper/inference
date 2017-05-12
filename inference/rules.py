@@ -4,10 +4,14 @@ from unification import Var, unify, reify
 from .proof import Proof
 
 class Rules:
-    def __init__(self):
+    def __init__(self, parser):
         self.rules = []
+        self.parser = parser
 
     def add(self, rule_name, inference, given=()):
+        # TODO remove the "rule=" from this method and use positional arg instead
+        inference = self.parser.parse(rule=inference)
+        given = tuple(self.parser.parse(rule=g) for g in given)
         self.rules.append((rule_name, inference, given))
 
     def prove_many(self, terms):
