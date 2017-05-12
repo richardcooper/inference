@@ -3,6 +3,13 @@ from unification import Var, unify, reify
 
 from .proof import Proof
 
+class Rule:
+    def __init__(self, name, conclusion, premises=()):
+        self.name = name
+        self.conclusion = conclusion
+        self.premises = premises
+
+
 class Rules:
     def __init__(self, parser):
         self.rules = []
@@ -12,7 +19,8 @@ class Rules:
         # TODO remove the "rule=" from this method and use positional arg instead
         inference = self.parser.parse(rule=inference)
         given = tuple(self.parser.parse(rule=g) for g in given)
-        self.rules.append((rule_name, inference, given))
+        rule = Rule(rule_name, inference, given)
+        self.rules.append(rule)
 
     def prove_many(self, terms):
         (first_term, *other_terms) = terms
@@ -37,17 +45,17 @@ class Rules:
                 term[i] = Var('__parent__.'+x.token)
         term = tuple(term)
 
-        for (rule_name, conclusion, premises) in self.rules:
-            variables = unify(term, conclusion)
+        for rule in self.rules:
+            variables = unify(term, rule.conclusion)
             if variables is False:
                 continue
 
-            if not premises:
-                yield Proof(rule_name, conclusion, variables)
+            if not rule.premises:
+                yield Proof(rule.name, rule.conclusion, variables)
                 continue
 
             # If we reach here it means that there are premises to prove.
-            reified_premises = [reify(x, variables) for x in premises]
+            reified_premises = [reify(x, variables) for x in rule.premises]
             for premise_proofs in self.prove_many(reified_premises):
                 candiate_variables = variables
                 for (premise, premise_proof) in zip(reified_premises, premise_proofs):
@@ -55,4 +63,4 @@ class Rules:
                     if candiate_variables is False:
                         continue # TODO is this the correct way to bail out here?
                         # Don't we need to continue the for loop one level higher?
-                yield Proof(rule_name, conclusion, candiate_variables, premise_proofs)
+                yield Proof(rule.name, rule.conclusion, candiate_variables, premise_proofs)
