@@ -1,6 +1,7 @@
 import pytest
 
 import inference
+from inference import Rule
 
 # The tests is this file are based on Chapter 3 of the book "Types and
 # Programming Languages" by Benjamin C. Pierce. That chapter describes a simple
@@ -22,37 +23,34 @@ class ArithSyntax(inference.Parser):
         'iszero {term}',
     )
 
-
-# These rules allow our simple simple language to be evaluated.
-small_step_semantics = inference.Rules(ArithSyntax())
-small_step_semantics.add('E_IfTrue', 'if true then {t2} else {t3} ⟶ {t2}')
-small_step_semantics.add('E_IfFalse', 'if false then {t2} else {t3} ⟶ {t3}')
-small_step_semantics.add('E_If',
-    'if {t1} then {t2} else {t3} ⟶ if {t1ʹ} then {t2} else {t3}',
-    given=['{t1} ⟶ {t1ʹ}']
-)
-small_step_semantics.add('E_PredZero', 'pred 0 ⟶ 0')
-small_step_semantics.add('E_PredSucc', 'pred succ {nv} ⟶ {nv}',
-    given=['{nv} ∈ NV']
-)
-small_step_semantics.add('E_Succ',
-    'succ {t} ⟶ succ {tʹ}',
-    given=['{t} ⟶ {tʹ}']
-)
-small_step_semantics.add('E_Pred', 'pred {t} ⟶ pred {tʹ}',
-    given=['{t} ⟶ {tʹ}']
-)
-small_step_semantics.add('E_IsZeroZero', 'iszero 0 ⟶ true')
-small_step_semantics.add('E_IsZeroSucc', 'iszero succ {nv} ⟶ false',
-    given=['{nv} ∈ NV']
-)
-small_step_semantics.add('E_IsZero', 'iszero {t} ⟶ iszero {tʹ}',
-    given=['{t} ⟶ {tʹ}']
-)
-small_step_semantics.add('S_NumericZero', '0 ∈ NV')
-small_step_semantics.add('S_NumericSucc', 'succ {nv} ∈ NV',
-    given=['{nv} ∈ NV']
-)
+class SmallStepSemantics(inference.Rules):
+    E_IfTrue        = Rule('if true then {t2} else {t3} ⟶ {t2}')
+    E_IfFalse       = Rule('if false then {t2} else {t3} ⟶ {t3}')
+    E_If            = Rule('if {t1} then {t2} else {t3} ⟶ if {t1ʹ} then {t2} else {t3}',
+                        given=['{t1} ⟶ {t1ʹ}']
+                    )
+    E_PredZero      = Rule('pred 0 ⟶ 0')
+    E_PredSucc      = Rule('pred succ {nv} ⟶ {nv}',
+                        given=['{nv} ∈ NV']
+                    )
+    E_Succ          = Rule('succ {t} ⟶ succ {tʹ}',
+                        given=['{t} ⟶ {tʹ}']
+                    )
+    E_Pred          = Rule('pred {t} ⟶ pred {tʹ}',
+                        given=['{t} ⟶ {tʹ}']
+                    )
+    E_IsZeroZero    = Rule('iszero 0 ⟶ true')
+    E_IsZeroSucc    = Rule('iszero succ {nv} ⟶ false',
+                        given=['{nv} ∈ NV']
+                    )
+    E_IsZero        = Rule('iszero {t} ⟶ iszero {tʹ}',
+                        given=['{t} ⟶ {tʹ}']
+                    )
+    S_NumericZero   = Rule('0 ∈ NV')
+    S_NumericSucc   = Rule('succ {nv} ∈ NV',
+                        given=['{nv} ∈ NV']
+                    )
+small_step_semantics = SmallStepSemantics(ArithSyntax())
 
 
 def evaluate(term):

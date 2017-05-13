@@ -4,23 +4,34 @@ from unification import Var, unify, reify
 from .proof import Proof
 
 class Rule:
-    def __init__(self, name, conclusion, premises=()):
-        self.name = name
+    def __init__(self, conclusion, given=()):
         self.conclusion = conclusion
-        self.premises = premises
+        self.premises = given
+        self.name = None
+
+    def __set_name__(self, owner, name):
+        self.name = name
 
 
 class Rules:
     def __init__(self, parser):
-        self.rules = []
         self.parser = parser
 
-    def add(self, rule_name, inference, given=()):
-        # TODO remove the "rule=" from this method and use positional arg instead
-        inference = self.parser.parse(rule=inference)
-        given = tuple(self.parser.parse(rule=g) for g in given)
-        rule = Rule(rule_name, inference, given)
-        self.rules.append(rule)
+    @property
+    def rules(self):
+        for name in dir(self):
+            candidate_rule = getattr(self, name)
+            if isinstance(candidate_rule, Rule):
+                rule = candidate_rule
+
+                # TODO If posible move this into Rule.__set_name__. Need to
+                # no some rejiging so that the parser is available at that
+                # point first.
+                if isinstance(rule.conclusion, str):
+                    rule.conclusion = self.parser.parse(rule=rule.conclusion)
+                    rule.premises = tuple(self.parser.parse(rule=p) for p in rule.premises)
+
+                yield rule
 
     def prove_many(self, terms):
         (first_term, *other_terms) = terms
