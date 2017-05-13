@@ -50,13 +50,11 @@ class SmallStepSemantics(inference.Rules):
     S_NumericSucc   = Rule('succ {nv} ∈ NV',
                         given=['{nv} ∈ NV']
                     )
-small_step_semantics = SmallStepSemantics()
-
 
 def evaluate(term):
     # TODO remove the "rule=" from this method and use positional arg instead
-    goal = small_step_semantics.parse(rule=(term+' ⟶ {result}'))
-    for proof in small_step_semantics.prove(goal):
+    goal = SmallStepSemantics.parse(rule=(term+' ⟶ {result}'))
+    for proof in SmallStepSemantics.prove(goal):
         result = proof['__parent__.result']
         yield (result, proof)
 
@@ -77,6 +75,6 @@ def evaluate(term):
 ])
 def test_single_step_evaluation(term, expected_result):
     # TODO also check that they are deterministic
-    expected_result = small_step_semantics.parse(term=expected_result)
+    expected_result = SmallStepSemantics.parse(term=expected_result)
     (result, proof) = next(evaluate(term))
     assert result == expected_result
