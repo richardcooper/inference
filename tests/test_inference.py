@@ -1,19 +1,19 @@
 import pytest
 
 import inference
-from inference import Rule
+from inference import Syntax, Rule
 
 # The tests is this file are based on Chapter 3 of the book "Types and
 # Programming Languages" by Benjamin C. Pierce. That chapter describes a simple
-# untyped language of boolean and arithmetic expressions.
-
-# This class describes the syntax of that language
-class ArithSyntax(inference.Parser):
-    rule = (
+# untyped language of boolean and arithmetic expressions. This class describes
+# that language.
+class SmallStepSemantics(inference.Rules):
+    ## SYNTAX
+    rule = Syntax(
         '{term} ⟶ {term}',
         '{term} ∈ NV',
     )
-    term = (
+    term = Syntax(
         'true',
         'false',
         '0',
@@ -23,7 +23,7 @@ class ArithSyntax(inference.Parser):
         'iszero {term}',
     )
 
-class SmallStepSemantics(inference.Rules):
+    ## SEMANTICS
     E_IfTrue        = Rule('if true then {t2} else {t3} ⟶ {t2}')
     E_IfFalse       = Rule('if false then {t2} else {t3} ⟶ {t3}')
     E_If            = Rule('if {t1} then {t2} else {t3} ⟶ if {t1ʹ} then {t2} else {t3}',
@@ -50,12 +50,12 @@ class SmallStepSemantics(inference.Rules):
     S_NumericSucc   = Rule('succ {nv} ∈ NV',
                         given=['{nv} ∈ NV']
                     )
-small_step_semantics = SmallStepSemantics(ArithSyntax())
+small_step_semantics = SmallStepSemantics()
 
 
 def evaluate(term):
     # TODO remove the "rule=" from this method and use positional arg instead
-    goal = ArithSyntax().parse(rule=(term+' ⟶ {result}'))
+    goal = small_step_semantics.parse(rule=(term+' ⟶ {result}'))
     for proof in small_step_semantics.prove(goal):
         result = proof['__parent__.result']
         yield (result, proof)
@@ -77,6 +77,6 @@ def evaluate(term):
 ])
 def test_single_step_evaluation(term, expected_result):
     # TODO also check that they are deterministic
-    expected_result = ArithSyntax().parse(term=expected_result)
+    expected_result = small_step_semantics.parse(term=expected_result)
     (result, proof) = next(evaluate(term))
     assert result == expected_result

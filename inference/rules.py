@@ -14,8 +14,6 @@ class Rule:
 
 
 class Rules:
-    def __init__(self, parser):
-        self.parser = parser
 
     @property
     def rules(self):
@@ -28,8 +26,8 @@ class Rules:
                 # no some rejiging so that the parser is available at that
                 # point first.
                 if isinstance(rule.conclusion, str):
-                    rule.conclusion = self.parser.parse(rule=rule.conclusion)
-                    rule.premises = tuple(self.parser.parse(rule=p) for p in rule.premises)
+                    rule.conclusion = self.parse(rule=rule.conclusion)
+                    rule.premises = tuple(self.parse(rule=p) for p in rule.premises)
 
                 yield rule
 
@@ -75,3 +73,9 @@ class Rules:
                         continue # TODO is this the correct way to bail out here?
                         # Don't we need to continue the for loop one level higher?
                 yield Proof(rule, candiate_variables, premise_proofs)
+
+    def parse(self, **kwargs):
+        items = list(kwargs.items())
+        (non_terminal_name, string_to_parse) = items.pop()
+        # TODO raise an exception if items is not now empty
+        return getattr(self, non_terminal_name).parse(string_to_parse)
