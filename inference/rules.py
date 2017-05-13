@@ -51,7 +51,7 @@ class Rules:
                 continue
 
             if not rule.premises:
-                yield Proof(rule.name, rule.conclusion, variables)
+                yield Proof(rule, variables)
                 continue
 
             # If we reach here it means that there are premises to prove.
@@ -63,4 +63,4 @@ class Rules:
                     if candiate_variables is False:
                         continue # TODO is this the correct way to bail out here?
                         # Don't we need to continue the for loop one level higher?
-                yield Proof(rule.name, rule.conclusion, candiate_variables, premise_proofs)
+                yield Proof(rule, candiate_variables, premise_proofs)
