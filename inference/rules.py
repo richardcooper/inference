@@ -1,7 +1,7 @@
 
 from unification import Var, unify, reify
 
-from .proof import Proof
+from .proof import Proof, Term
 
 class Rule:
     def __init__(self, conclusion, given=()):
@@ -80,4 +80,4 @@ class Rules:
         items = list(kwargs.items())
         (non_terminal_name, string_to_parse) = items.pop()
         # TODO raise an exception if items is not now empty
-        return getattr(cls, non_terminal_name).parse(string_to_parse)
+        return Term(getattr(cls, non_terminal_name).parse(string_to_parse))

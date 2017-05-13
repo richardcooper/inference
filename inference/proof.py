@@ -2,6 +2,18 @@ import itertools
 
 from unification import reify, Var
 
+
+class Term(tuple):
+    def __str__(self):
+        return ' '.join(Term.__str__(x) if isinstance(x, tuple) else str(x) for x in self)
+
+    def __repr__(self):
+        # TODO maybe wrap this in <Term "%r">
+        # TODO refactor for clarity and code resuse with __str__
+        return '(%s)'%(' '.join(Term.__repr__(x) if isinstance(x, tuple) else str(x) for x in self))
+
+
+
 class Proof:
     def __init__(self, rule, variables, premises=()):
         self.rule = rule
@@ -10,10 +22,10 @@ class Proof:
 
     @property
     def conclusion(self):
-        return reify(self.rule.conclusion, self.variables)
+        return Term(reify(self.rule.conclusion, self.variables))
 
     def __getitem__(self, item_name):
-        return reify(self.variables[Var(item_name)], self.variables)
+        return Term(reify(self.variables[Var(item_name)], self.variables))
 
     def __str__(self):
         premise_strs = [str(p) for p in self.premises]
