@@ -37,7 +37,7 @@ class Rules:
         for proof in cls.prove(first_term):
             if other_terms:
                 reified_other_terms = reify(other_terms, proof.variables)
-                for other_proofs in prove_many(cls, reified_other_terms):
+                for other_proofs in cls.prove_many(reified_other_terms):
                     yield (proof, *other_proofs)
             else:
                 yield (proof, )
