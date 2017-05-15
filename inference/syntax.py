@@ -11,7 +11,16 @@ def parse_token(token):
         return token
 
 def parse_action(tokens):
-    return tuple(parse_token(t) for t in tokens)
+    parsed_tokens = tuple(parse_token(t) for t in tokens)
+    if len(parsed_tokens) == 1 and isinstance(parsed_tokens[0], (tuple, Var)):
+        # In some more complex grammars a token could go through many non-terminal grammar
+        # rules before being matched by a terminal. That leads to parse trees with a level
+        # of nesting equal to the number of non-terminals passed through. To avoid having
+        # the shape of the AST depends on implementation details of the grammar we unwrap
+        # redundantly nested terms and variables here.
+        return parsed_tokens[0]
+    else:
+        return parsed_tokens
 
 
 class Syntax:
