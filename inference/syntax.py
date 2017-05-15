@@ -1,11 +1,9 @@
 from collections import defaultdict
 
-from pyparsing import Keyword, Forward, And, Or
-
+import pyparsing as pp
 from unification import Var
 
 # TODO THIS BIT IS NOT GENERAL PURPOSE
-from pyparsing import Regex
 def parse_token(token):
     if isinstance(token, str) and token.startswith('{'):
         return Var(token.lstrip('{').rstrip('}'))
@@ -21,15 +19,15 @@ class Syntax:
         self.definitions = definitions
         # TODO can we do this lazily so parser is only wrapped in a Forward if
         # absolutely necessary?
-        self.parser = Forward()
+        self.parser = pp.Forward()
 
     def __set_name__(self, owner, name):
         self.owner = owner
         string_parsers = [self.parser_for_string(s) for s in self.definitions]
-        parser = Or(string_parsers)
+        parser = pp.Or(string_parsers)
 
         # TODO THIS BIT IS NOT GENERAL PURPOSE
-        metavar = Regex(r'\{[^\{\}\s]+\}')
+        metavar = pp.Regex(r'\{[^\{\}\s]+\}')
         parser = parser | metavar
 
         self.parser <<= parser
@@ -37,7 +35,7 @@ class Syntax:
     def parser_for_string(self, string):
         tokens = string.split()
         token_parsers = [self.parser_for_token(t) for t in tokens]
-        parser = And(token_parsers)
+        parser = pp.And(token_parsers)
         parser.setParseAction(parse_action)
         #print('Grammar for', string, 'is', repr(parser))
         return parser
@@ -50,7 +48,7 @@ class Syntax:
             # something without a parser. Raise a better exception if it's not
             # clear.
         else:
-            return Keyword(token)
+            return pp.Keyword(token)
 
     def parse(self, string_to_parse):
         return self.parser.parseString(string_to_parse, parseAll=True)[0]
