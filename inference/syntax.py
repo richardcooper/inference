@@ -53,4 +53,4 @@ class Syntax:
             return Keyword(token)
 
     def parse(self, string_to_parse):
-        return self.parser.parseString(string_to_parse)[0]
+        return self.parser.parseString(string_to_parse, parseAll=True)[0]
