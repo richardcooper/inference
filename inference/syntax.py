@@ -1,4 +1,5 @@
 from collections import defaultdict
+import re
 
 import pyparsing as pp
 from unification import Var
@@ -44,6 +45,9 @@ class Syntax:
         self.parser <<= parser
 
     def parser_for_string(self, string):
+        if hasattr(string, 'match'):
+            return pp.Regex(string) + pp.WordEnd()
+
         tokens = string.split()
         token_parsers = [self.parser_for_token(t) for t in tokens]
         parser = pp.And(token_parsers)
