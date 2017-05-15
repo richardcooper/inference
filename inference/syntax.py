@@ -34,10 +34,12 @@ class Syntax:
         self.owner = owner
         string_parsers = [self.parser_for_string(s) for s in self.definitions]
         parser = pp.Or(string_parsers)
+        parser.setName(name)
 
         # TODO THIS BIT IS NOT GENERAL PURPOSE
         metavar = pp.Regex(r'\{[^\{\}\s]+\}')
-        parser = parser | metavar
+        metavar.setName('metavar')
+        parser |= metavar
 
         self.parser <<= parser
 
