@@ -11,6 +11,8 @@ class Rule:
 
     def __set_name__(self, owner, name):
         self.name = name
+        self.conclusion = owner.parse(rule=self.conclusion)
+        self.premises = tuple(owner.parse(rule=p) for p in self.premises)
 
 
 class Rules:
@@ -21,14 +23,6 @@ class Rules:
             candidate_rule = getattr(cls, name)
             if isinstance(candidate_rule, Rule):
                 rule = candidate_rule
-
-                # TODO If posible move this into Rule.__set_name__. Need to
-                # no some rejiging so that the parser is available at that
-                # point first.
-                if isinstance(rule.conclusion, str):
-                    rule.conclusion = cls.parse(rule=rule.conclusion)
-                    rule.premises = tuple(cls.parse(rule=p) for p in rule.premises)
-
                 yield rule
 
     @classmethod
