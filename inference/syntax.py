@@ -46,7 +46,7 @@ class Syntax:
 
     def parser_for_string(self, string):
         if hasattr(string, 'match'):
-            return pp.Regex(string) + pp.WordEnd()
+            return pp.Regex(string)
 
         tokens = string.split()
         token_parsers = [self.parser_for_token(t) for t in tokens]
