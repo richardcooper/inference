@@ -53,10 +53,9 @@ class SmallStepSemantics(inference.Rules):
 
 def evaluate(term):
     # TODO remove the "rule=" from this method and use positional arg instead
-    goal = SmallStepSemantics.parse(rule=(term+' ⟶ {result}'))
-    for proof in SmallStepSemantics.prove(goal):
-        result = proof['__parent__.result']
-        yield (result, proof)
+    proof = SmallStepSemantics.prove(term+' ⟶ {result}')
+    result = proof['__parent__.result']
+    return (result, proof)
 
 @pytest.mark.parametrize("term,expected_result", [
     ('if true then true else false', 'true'),
@@ -76,5 +75,5 @@ def evaluate(term):
 def test_single_step_evaluation(term, expected_result):
     # TODO also check that they are deterministic
     expected_result = SmallStepSemantics.parse(term=expected_result)
-    (result, proof) = next(evaluate(term))
+    (result, proof) = evaluate(term)
     assert result == expected_result

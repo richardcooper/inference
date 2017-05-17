@@ -26,18 +26,18 @@ class Rules:
                 yield rule
 
     @classmethod
-    def prove_many(cls, terms):
+    def _proofs_of_many(cls, terms):
         (first_term, *other_terms) = terms
-        for proof in cls.prove(first_term):
+        for proof in cls._proofs_of(first_term):
             if other_terms:
                 reified_other_terms = reify(other_terms, proof.variables)
-                for other_proofs in cls.prove_many(reified_other_terms):
+                for other_proofs in cls._proofs_of_many(reified_other_terms):
                     yield (proof, *other_proofs)
             else:
                 yield (proof, )
 
     @classmethod
-    def prove(cls, term):
+    def _proofs_of(cls, term):
 
         # If term contains any variables then we rename them here so that they
         # don't collide with variable names used in this proof.
@@ -60,7 +60,7 @@ class Rules:
 
             # If we reach here it means that there are premises to prove.
             reified_premises = [reify(x, variables) for x in rule.premises]
-            for premise_proofs in cls.prove_many(reified_premises):
+            for premise_proofs in cls._proofs_of_many(reified_premises):
                 candiate_variables = variables
                 for (premise, premise_proof) in zip(reified_premises, premise_proofs):
                     candiate_variables = unify(premise, premise_proof.conclusion, candiate_variables)
@@ -75,3 +75,14 @@ class Rules:
         (non_terminal_name, string_to_parse) = items.pop()
         # TODO raise an exception if items is not now empty
         return Term(getattr(cls, non_terminal_name).parse(string_to_parse))
+
+    @classmethod
+    def prove(cls, goal):
+        term = cls.parse(rule=goal)
+        proof = next(cls._proofs_of(term))
+        return proof
+
+    @classmethod
+    def proofs_of(cls, goal):
+        term = cls.parse(rule=goal)
+        yield from cls._proofs_of(term)
