@@ -45,6 +45,9 @@ class Syntax:
         self.parser <<= parser
 
     def parser_for_string(self, string):
+        if string == '':
+            return pp.Empty()
+
         if hasattr(string, 'match'):
             return pp.Regex(string)
 
