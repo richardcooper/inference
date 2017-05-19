@@ -35,7 +35,11 @@ class Proof:
 
 
     def __getitem__(self, item_name):
-        return Term(reify(self.variables[Var(item_name)], self.variables))
+        reified_item = reify(self.variables[Var(item_name)], self.variables)
+        if isinstance(reified_item, tuple):
+            return Term(reified_item)
+        else:
+            return Term((reified_item,))
 
     def __str__(self):
         premise_strs = [str(p) for p in self.premises]
