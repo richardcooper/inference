@@ -34,7 +34,7 @@ class Syntax:
     def __set_name__(self, owner, name):
         self.owner = owner
         string_parsers = [self.parser_for_string(s) for s in self.definitions]
-        parser = pp.Or(string_parsers)
+        parser = pp.MatchFirst(string_parsers)
         parser.setName(name)
 
         # TODO THIS BIT IS NOT GENERAL PURPOSE
