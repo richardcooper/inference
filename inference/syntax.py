@@ -4,6 +4,7 @@ import re
 import pyparsing as pp
 from unification import Var
 
+parens = ('(', ')')
 # TODO THIS BIT IS NOT GENERAL PURPOSE
 def parse_token(token):
     if isinstance(token, str) and token.startswith('{'):
@@ -67,6 +68,8 @@ class Syntax:
             # TODO Check what happens if this getattr() fails or returns
             # something without a parser. Raise a better exception if it's not
             # clear.
+        elif token in parens:
+            return pp.Suppress(token)
         else:
             return pp.Literal(token)
 
