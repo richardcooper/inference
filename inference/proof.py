@@ -55,3 +55,15 @@ class Proof:
     def __repr__(self):
         return self.__str__(to_string=repr)
 
+    @property
+    def size(self):
+        return 1 + sum(x.size for x in self.premises)
+
+    @property
+    def depth(self):
+        return 1 + max((x.depth for x in self.premises), default=0)
+
+    @property
+    def width(self):
+        return sum(x.width for x in self.premises) or 1
+
