@@ -2,6 +2,7 @@
 from unification import Var, unify, reify
 
 from .proof import Proof, Term
+from .rename_variables import rename_variables
 
 class Rule:
     def __init__(self, conclusion, given=()):
@@ -41,13 +42,7 @@ class Rules:
 
         # If term contains any variables then we rename them here so that they
         # don't collide with variable names used in this proof.
-        # TODO Pull out into a function and generalise it to
-        # handle the parent vars being nested rather than top level.
-        term = list(term)
-        for (i, x) in enumerate(term):
-            if isinstance(x, Var):
-                term[i] = Var('__parent__.'+x.token)
-        term = tuple(term)
+        term = rename_variables(term, '__parent__.')
 
         for rule in cls.get_rules():
             variables = unify(term, rule.conclusion)
