@@ -66,7 +66,7 @@ class Syntax:
             # something without a parser. Raise a better exception if it's not
             # clear.
         else:
-            return pp.Keyword(token)
+            return pp.Literal(token)
 
     def parse(self, string_to_parse):
         return self.parser.parseString(string_to_parse, parseAll=True)[0]
