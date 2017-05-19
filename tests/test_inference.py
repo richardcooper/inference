@@ -51,11 +51,11 @@ class SmallStepSemantics(inference.Rules):
                         given=['{nv} ∈ NV']
                     )
 
-def evaluate(term):
-    # TODO remove the "rule=" from this method and use positional arg instead
-    proof = SmallStepSemantics.prove(term+' ⟶ {result}')
-    result = proof['__parent__.result']
-    return (result, proof)
+    @classmethod
+    def evaluate(cls, expression):
+        goal = f'{expression} ⟶ {{__result__}}'
+        return cls.solve(goal)
+
 
 @pytest.mark.parametrize("term,expected_result", [
     ('if true then true else false', 'true'),
@@ -75,5 +75,5 @@ def evaluate(term):
 def test_single_step_evaluation(term, expected_result):
     # TODO also check that they are deterministic
     expected_result = SmallStepSemantics.parse(term=expected_result)
-    (result, proof) = evaluate(term)
+    result = SmallStepSemantics.evaluate(term)
     assert result == expected_result

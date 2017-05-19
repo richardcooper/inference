@@ -90,3 +90,10 @@ class Rules:
     def proofs_of(cls, goal):
         term = cls.parse(rule=goal)
         yield from cls._proofs_of(term)
+
+    @classmethod
+    def solve(cls, goal):
+        proof = cls.prove(goal)#, unambigiously=True)
+        result = proof['__parent__.__result__']
+        result.proof = proof
+        return result
