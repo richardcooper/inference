@@ -41,9 +41,9 @@ class Proof:
         else:
             return Term((reified_item,))
 
-    def __str__(self):
-        premise_strs = [str(p) for p in self.premises]
-        conclusion_str = str(self.conclusion)
+    def __str__(self, to_string=str):
+        premise_strs = [to_string(p) for p in self.premises]
+        conclusion_str = to_string(self.conclusion)
         template = '  '.join('{:<%d}'%len(max(y, key=len)) for y in [x.split('\n')[::-1] for x in premise_strs])
         result = [template.format(*y) for y in itertools.zip_longest(*(x.split('\n')[::-1] for x in premise_strs), fillvalue='')][::-1]
         width = max([line.rfind('-') for line in result]) if result else 0
@@ -51,3 +51,7 @@ class Proof:
         result.append('-'*width+f'  <<{self.rule.name}>>')
         result.append(conclusion_str)
         return '\n'.join(result)
+
+    def __repr__(self):
+        return self.__str__(to_string=repr)
+
