@@ -33,6 +33,7 @@ class Syntax:
 
     def __set_name__(self, owner, name):
         self.owner = owner
+        self.name = name
         string_parsers = [self.parser_for_string(s) for s in self.definitions]
         parser = pp.MatchFirst(string_parsers)
         parser.setName(name)
@@ -54,7 +55,8 @@ class Syntax:
         tokens = string.split()
         token_parsers = [self.parser_for_token(t) for t in tokens]
         parser = pp.And(token_parsers)
-        parser.setParseAction(parse_action)
+        if not self.name.endswith('ʹ'):
+            parser.setParseAction(parse_action)
         #print('Grammar for', string, 'is', repr(parser))
         return parser
 
