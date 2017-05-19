@@ -30,7 +30,7 @@ class Rules:
         (first_term, *other_terms) = terms
         for proof in cls._proofs_of(first_term):
             if other_terms:
-                reified_other_terms = reify(other_terms, proof.variables)
+                reified_other_terms = reify(other_terms, proof.parent_variables)
                 for other_proofs in cls._proofs_of_many(reified_other_terms):
                     yield (proof, *other_proofs)
             else:
@@ -65,9 +65,11 @@ class Rules:
                 for (premise, premise_proof) in zip(reified_premises, premise_proofs):
                     candiate_variables = unify(premise, premise_proof.conclusion, candiate_variables)
                     if candiate_variables is False:
-                        continue # TODO is this the correct way to bail out here?
+                        break # TODO is this the correct way to bail out here?
                         # Don't we need to continue the for loop one level higher?
-                yield Proof(rule, candiate_variables, premise_proofs)
+                else:
+                    yield Proof(rule, candiate_variables, premise_proofs)
+
 
     @classmethod
     def parse(cls, **kwargs):

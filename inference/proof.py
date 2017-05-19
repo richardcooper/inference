@@ -24,6 +24,16 @@ class Proof:
     def conclusion(self):
         return Term(reify(self.rule.conclusion, self.variables))
 
+    @property
+    def parent_variables(self):
+        prefix = '__parent__.'
+        return {
+            Var(k.token[len(prefix):]) : v
+            for k,v in self.variables.items()
+            if k.token.startswith(prefix)
+        }
+
+
     def __getitem__(self, item_name):
         return Term(reify(self.variables[Var(item_name)], self.variables))
 
