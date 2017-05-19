@@ -74,7 +74,11 @@ class Rules:
         items = list(kwargs.items())
         (non_terminal_name, string_to_parse) = items.pop()
         # TODO raise an exception if items is not now empty
-        return Term(getattr(cls, non_terminal_name).parse(string_to_parse))
+        parsed = getattr(cls, non_terminal_name).parse(string_to_parse)
+        if isinstance(parsed, tuple):
+            return Term(parsed)
+        else:
+            return Term((parsed,))
 
     @classmethod
     def prove(cls, goal):
