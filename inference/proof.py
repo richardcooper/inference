@@ -67,3 +67,8 @@ class Proof:
     def width(self):
         return sum(x.width for x in self.premises) or 1
 
+
+    # TODO is there a good way to only load this if were running in Jupyter
+    def _repr_html_(self):
+        from .jupyter import proof_to_html
+        return proof_to_html(self)
