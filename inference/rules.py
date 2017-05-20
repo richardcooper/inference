@@ -3,6 +3,8 @@ from unification import Var, unify, reify
 
 from .proof import Proof, Term
 from .rename_variables import rename_variables
+from .errors import NoProofFoundError, MultipleProofsError
+
 
 class Rule:
     def __init__(self, conclusion, given=()):
@@ -78,9 +80,21 @@ class Rules:
             return Term((parsed,))
 
     @classmethod
-    def prove(cls, goal):
+    def prove(cls, goal, unambiguously=True):
         term = cls.parse(rule=goal)
-        proof = next(cls._proofs_of(term))
+        proofs = cls._proofs_of(term)
+        try:
+            proof = next(proofs)
+        except StopIteration:
+            raise NoProofFoundError from None
+
+        if unambiguously:
+            try:
+                next(proofs)
+                raise MultipleProofsError()
+            except StopIteration:
+                pass
+
         return proof
 
     @classmethod
@@ -90,7 +104,7 @@ class Rules:
 
     @classmethod
     def solve(cls, goal):
-        proof = cls.prove(goal)#, unambigiously=True)
+        proof = cls.prove(goal)#, unambiguously=True)
         result = proof['__parent__.__result__']
         result.proof = proof
         return result
