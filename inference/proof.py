@@ -26,10 +26,20 @@ class Proof:
 
     @property
     def parent_variables(self):
+        # Before we throw away the variables which don't come from the parent
+        # we need to resolving any indirection in the variables. We can do that
+        # by reify the variables against themselves. For example if:
+        #    self.variables = {~__parent__.x: ~x, ~x: '0'}
+        # then without this reify()
+        #    parent_variables = {~x: ~x} which is broken.
+        # with this reify()
+        #    parent_variables = {~x: 0} which is correct.
+        reified_variables = reify(self.variables, self.variables)
+
         prefix = '__parent__.'
         return {
             Var(k.token[len(prefix):]) : v
-            for k,v in self.variables.items()
+            for k,v in reified_variables.items()
             if k.token.startswith(prefix)
         }
 
