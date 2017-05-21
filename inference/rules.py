@@ -14,8 +14,8 @@ class Rule:
 
     def __set_name__(self, owner, name):
         self.name = name
-        self.conclusion = owner.parse(rule=self.conclusion)
-        self.premises = tuple(owner.parse(rule=p) for p in self.premises)
+        self.conclusion = owner.parse(self.conclusion)
+        self.premises = tuple(owner.parse(p) for p in self.premises)
 
 
 class Rules:
@@ -69,19 +69,20 @@ class Rules:
 
 
     @classmethod
-    def parse(cls, **kwargs):
-        items = list(kwargs.items())
-        (non_terminal_name, string_to_parse) = items.pop()
-        # TODO raise an exception if items is not now empty
-        parsed = getattr(cls, non_terminal_name).parse(string_to_parse)
-        if isinstance(parsed, tuple):
-            return Term(parsed)
+    def parse(cls, *args, **kwargs):
+        number_of_args = len(args) + len(kwargs)
+        if number_of_args != 1:
+            raise TypeError(f'{cls.__name__}.parse expected 1 argument, got {number_of_args}')
+        if kwargs:
+            (non_terminal_name, string_to_parse) = kwargs.popitem()
         else:
-            return Term((parsed,))
+            non_terminal_name = 'rule'
+            string_to_parse = args[0]
+        return getattr(cls, non_terminal_name).parse(string_to_parse)
 
     @classmethod
     def prove(cls, goal, unambiguously=True):
-        term = cls.parse(rule=goal)
+        term = cls.parse(goal)
         proofs = cls._proofs_of(term)
         try:
             proof = next(proofs)
@@ -99,7 +100,7 @@ class Rules:
 
     @classmethod
     def proofs_of(cls, goal):
-        term = cls.parse(rule=goal)
+        term = cls.parse(goal)
         yield from cls._proofs_of(term)
 
     @classmethod

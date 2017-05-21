@@ -4,6 +4,8 @@ import re
 import pyparsing as pp
 from unification import Var
 
+from .proof import Term
+
 parens = ('(', ')')
 # TODO THIS BIT IS NOT GENERAL PURPOSE
 def parse_token(token):
@@ -74,4 +76,8 @@ class Syntax:
             return pp.Literal(token)
 
     def parse(self, string_to_parse):
-        return self.parser.parseString(string_to_parse, parseAll=True)[0]
+        parsed = self.parser.parseString(string_to_parse, parseAll=True)[0]
+        if isinstance(parsed, tuple):
+            return Term(parsed)
+        else:
+            return Term((parsed,))
