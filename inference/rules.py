@@ -104,8 +104,8 @@ class Rules:
         yield from cls._proofs_of(term)
 
     @classmethod
-    def solve(cls, goal):
-        proof = cls.prove(goal)#, unambiguously=True)
+    def solve(cls, goal, unambiguously=True):
+        proof = cls.prove(goal, unambiguously=unambiguously)
         result = proof['__parent__.__result__']
         result.proof = proof
         return result
