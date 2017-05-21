@@ -62,8 +62,7 @@ class Rules:
                 for (premise, premise_proof) in zip(reified_premises, premise_proofs):
                     candiate_variables = unify(premise, premise_proof.conclusion, candiate_variables)
                     if candiate_variables is False:
-                        break # TODO is this the correct way to bail out here?
-                        # Don't we need to continue the for loop one level higher?
+                        break
                 else:
                     yield Proof(rule, candiate_variables, premise_proofs)
 

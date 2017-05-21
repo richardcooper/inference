@@ -8,8 +8,6 @@ class Term(tuple):
         return ' '.join(Term.__str__(x) if isinstance(x, tuple) else str(x) for x in self)
 
     def __repr__(self):
-        # TODO maybe wrap this in <Term "%r">
-        # TODO refactor for clarity and code resuse with __str__
         return '(%s)'%(' '.join(Term.__repr__(x) if isinstance(x, tuple) else str(x) for x in self))
 
 
@@ -77,8 +75,6 @@ class Proof:
     def width(self):
         return sum(x.width for x in self.premises) or 1
 
-
-    # TODO is there a good way to only load this if were running in Jupyter
     def _repr_html_(self):
         from .jupyter import proof_to_html
         return proof_to_html(self)
