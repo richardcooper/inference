@@ -109,3 +109,10 @@ class Rules:
         result = proof['__parent__.__result__']
         result.proof = proof
         return result
+
+    @classmethod
+    def solutions_to(cls, goal):
+        for proof in cls.proofs_of(goal):
+            result = proof['__parent__.__result__']
+            result.proof = proof
+            yield result
